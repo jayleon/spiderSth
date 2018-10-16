@@ -12,18 +12,23 @@ import requests
 import urllib3
 import lxml.etree as etree
 import HTMLParser
+from logging.handlers import TimedRotatingFileHandler
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
 requests.packages.urllib3.disable_warnings()
 
+log_file_path = '../log/http_utils.log'
 logger = logging.getLogger('http_utils.py')
-
 ch = logging.StreamHandler()
-formatter = logging.Formatter('%(name)-12s %(asctime)s %(levelname)-8s %(message)s', '%a, %d %b %Y %H:%M:%S', )
+th = TimedRotatingFileHandler(log_file_path, when="MIDNIGHT", interval=1, backupCount=7)
+formatter = logging.Formatter('%(name)s ：%(lineno)d ------ %(asctime)s------ %(levelname)s ------ %(message)s',
+                              '%a, %d %b %Y %H:%M:%S', )
 ch.setFormatter(formatter)
+th.setFormatter(formatter)
 logger.addHandler(ch)
+logger.addHandler(th)
 logger.setLevel(logging.INFO)
 
 class HttpRequest(object):
