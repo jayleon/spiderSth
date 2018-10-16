@@ -79,6 +79,7 @@ def to_etherscan(tokens):
                 for value in totals: total += value.strip()
                 # 正则匹配所需值
                 total1 = total.split(' ')[0].replace(',', '')
+                total1 = re.findall('[\d+\.\d]*',total1)[0]
                 print total1
                 tokens['totalSupply1'] = total1
                 total2s = re.search('\(\$.*?\)', total)
@@ -149,5 +150,10 @@ def supplement():
         collection.update_one({'contractAddress': tokens['contractAddress']}, {'$set': tokens})
 
 if __name__ == '__main__':
+
+    # 跑mongo中已有的数据
+    # start()
+
+    # 补充错误数据
     supplement()
-    logger.info("info msg...")
+    # logger.info("info msg...")
