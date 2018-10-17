@@ -98,14 +98,38 @@ def to_etherscan(tokens):
         Write_log(contractAddress)
     return tokens
 
+def to_etherscan_getopcode(tokens):
+    try:
+        contractAddress = tokens['contractAddress']
+        URL = "https://etherscan.io/api?module=opcode&action=getopcode&address=%s" % contractAddress
+        http = HttpRequest()
+        http.setTimeout(50)
+        texts = http.setUrl(URL).setRequestType('get').getResponse().text
+        if texts != None:
+            # 解析json源码
+            jt = json.loads(texts, encoding='utf-8')
+            result = jt.get("result")
+            if result:
+                contractCreationCode = str(result).replace('<br>', '\r\n')
+                print contractCreationCode
+                tokens['contractCreationCode'] = contractCreationCode
+
+        else:
+            Write_log(contractAddress)
+    except Exception, e:
+        logger.error(e.message)
+        logger.error(traceback.format_exc())
+        Write_log(contractAddress)
+    return tokens
+
 def start():
     # 连接MongoDB，查询tokens，根据contractAddress到etherscan查询最新数据
     client = MongoCluster().connect()
     db = client.get_database('gse-transaction')
     collection = db.get_collection('tokens')
-    for tokens in collection.find({"contractAddress": {"$gt": "0"}}).sort('contractAddress'):
+    for tokens in collection.find({"contractAddress": {"$gt": "0"}}, no_cursor_timeout=True).sort('contractAddress').batch_size(2):
         logger.info(tokens)
-        tokens = to_etherscan(tokens=tokens)
+        tokens = to_etherscan_getopcode(tokens=tokens)
         collection.update_one({'contractAddress': tokens['contractAddress']}, {'$set': tokens})
         # break
 
@@ -118,7 +142,7 @@ def supplement():
     collection = db.get_collection('tokens')
     for addr in normal_list:
         tokens = collection.find_one({"contractAddress": addr})
-        tokens = to_etherscan(tokens=tokens)
+        tokens = to_etherscan_getopcode(tokens=tokens)
         collection.update_one({'contractAddress': tokens['contractAddress']}, {'$set': tokens})
 
 if __name__ == '__main__':

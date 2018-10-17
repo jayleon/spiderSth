@@ -131,7 +131,9 @@ def start():
     client = MongoCluster().connect()
     db = client.get_database('gse-transaction')
     collection = db.get_collection('tokens')
-    for tokens in collection.find({"contractAddress": {"$gt": "0"}}).sort('contractAddress'):
+    # 设置no_cursor_timeout = True，永不超时，游标连接不会主动关闭，需要手动关闭
+    # 设置batch_size返回文档数，默认应该是101个文档或者size超过1M，可以设置小一些
+    for tokens in collection.find({"contractAddress": {"$gt": "0"}}, no_cursor_timeout=True).sort('contractAddress').batch_size(2):
         logger.info(tokens)
         tokens = to_etherscan(tokens=tokens)
         collection.update_one({'contractAddress': tokens['contractAddress']}, {'$set': tokens})
