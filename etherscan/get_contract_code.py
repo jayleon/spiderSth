@@ -148,8 +148,8 @@ def supplement():
 if __name__ == '__main__':
 
     # 跑mongo中已有的数据
-    start()
+    #start()
 
     # 补充错误数据
-    # supplement()
+    supplement()
     # logger.info("info msg...")

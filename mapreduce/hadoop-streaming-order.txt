@@ -1,0 +1,31 @@
+hadoop jar /usr/local/hadoop/hadoop-streaming-0.23.6.jar \
+-D mapred.job.name="testhadoop" \
+-D mapred.job.queue.name=testhadoopqueue \
+-D mapred.map.tasks=50 \
+-D mapred.min.split.size=1073741824 \
+-D mapred.reduce.tasks=10 \
+-D stream.num.map.output.key.fields=1 \
+-D num.key.fields.for.partition=1 \
+-input input/sample.csv \
+-output output-streaming \
+-mapper mapper.py \
+-reducer reducer.py \
+-file mapper.py \
+-file reducer.py \
+-partitioner org.apache.hadoop.mapred.lib.KeyFieldBasedPartitioner
+
+命令的解释如下
+（1）-input：输入文件路径
+（2）-output：输出文件路径
+（3）-mapper：用户自己写的mapper程序，可以是可执行文件或者脚本
+（4）-reducer：用户自己写的reducer程序，可以是可执行文件或者脚本
+（5）-file：打包文件到提交的作业中，可以是mapper或者reducer要用的输入文件，如配置文件，字典等。
+         这个一般是必须有的，因为mapper和reducer函数都是写在本地的文件中，因此需要将文件上传到集群中才能被执行
+（6）-partitioner：用户自定义的partitioner程序
+（7）-D：作业的一些属性（以前用的是-jonconf），具体有：
+              1）mapred.map.tasks：map task数目
+              设置的数目与实际运行的值并不一定相同，若输入文件含有M个part，而此处设置的map_task数目超过M，那么实际运行map_task仍然是M
+              2）mapred.reduce.tasks：reduce task数目  不设置的话，默认值就为1
+              3）num.key.fields.for.partition=N：shuffle阶段将数据集的前N列作为Key；所以对于wordcount程序，map输出为“word  1”，shuffle是以word作为Key，因此这里N=1
+（8）-D stream.num.map.output.key.fields=1 这个是指在reduce之前将数据按前1列做排序，一般情况下可以去掉
+
