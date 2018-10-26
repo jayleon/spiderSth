@@ -40,3 +40,6 @@ mailto_list = conf.get('email', 'mailto_list')
 mail_host = conf.get('email', 'mail_host')
 mail_user = conf.get('email', 'mail_user')
 mail_pass = conf.get('email', 'mail_pass')
+
+# hdfs
+hdfs_host = conf.get('hdfs', 'hdfs_host')

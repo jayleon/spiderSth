@@ -2,15 +2,11 @@
 # coding:utf-8
 # 从hdfs读取文件到mongo；本地HdfsClient.open报错，上传脚本到服务器上执行OK。
 
-import sys,re
-import logging,traceback
-import lxml.etree as etree
-import HTMLParser
-from logging.handlers import TimedRotatingFileHandler
+import sys
 
 sys.path.append('../utils')
 from mongo_utils import *
-from common_utils import *
+from read_config import *
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -27,7 +23,7 @@ logger.addHandler(ch)
 logger.addHandler(th)
 logger.setLevel(logging.INFO)
 
-hdfs_ip = 'ip-192-168-0-145.ap-southeast-1.compute.internal'
+hdfs_ip = read_config.hdfs_host
 
 log_files = ''  # 日志目录
 def Write_log(line):
