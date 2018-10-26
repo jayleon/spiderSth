@@ -3,9 +3,12 @@
 """
 @describe：数据库配置信息
 """
+import sys
+sys.path.append('../config')
+import read_config
 
 # 数据库信息
-DB_TEST_HOST = '127.0.0.1'
+DB_TEST_HOST = read_config.mysql_host
 
 # 数据库端口号
 DB_TEST_PORT = 3306

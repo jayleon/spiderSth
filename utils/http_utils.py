@@ -121,13 +121,12 @@ class HttpRequest(object):
 
     def fire(self):
         proxies = None
-
-        logger.info('local ip !!')
+        # logger.info('local ip !!')
         try:
             if self.type == 'post':
                 response = requests.post(self.url, data=self.body, headers=self.headerDict, timeout=self.timeout,
                                          proxies=proxies, cookies=self.cookies)
-                logger.info('request_type:post, url:%s, status_code:%s' % (self.url, response.status_code))
+                # logger.info('request_type:post, url:%s, status_code:%s' % (self.url, response.status_code))
             elif self.type == 'put':
                 response = requests.put(self.url, data=self.body, headers=self.headerDict, timeout=self.timeout,
                                         proxies=proxies, cookies=self.cookies)
@@ -135,7 +134,7 @@ class HttpRequest(object):
             else:
                 response = requests.get(self.url, headers=self.headerDict, timeout=self.timeout, proxies=proxies,
                                         cookies=self.cookies, data=self.body, verify=False)
-                logger.info('request_type:get,  url:%s, status_code:%s' % (self.url, response.status_code))
+                # logger.info('request_type:get,  url:%s, status_code:%s' % (self.url, response.status_code))
             self.cookies = response.cookies
             self.response_header = response.headers
             return response

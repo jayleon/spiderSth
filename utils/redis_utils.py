@@ -3,27 +3,29 @@
 # redis集群工具类
 
 from rediscluster import StrictRedisCluster
-import time, os, sys, logging
+import json, os, sys, logging
+from logging.handlers import TimedRotatingFileHandler
+sys.path.append('../config')
+import read_config
 
+log_file_path = '../log/redis_utils.log'
 logger = logging.getLogger('redis_utils.py')
-
 ch = logging.StreamHandler()
-formatter = logging.Formatter('%(name)-12s %(asctime)s %(levelname)-8s %(message)s', '%a, %d %b %Y %H:%M:%S', )
+th = TimedRotatingFileHandler(log_file_path, when="MIDNIGHT", interval=1, backupCount=7)
+formatter = logging.Formatter('%(name)s ：%(lineno)d ------ %(asctime)s------ %(levelname)s ------ %(message)s',
+                              '%a, %d %b %Y %H:%M:%S', )
 ch.setFormatter(formatter)
+th.setFormatter(formatter)
 logger.addHandler(ch)
+logger.addHandler(th)
 logger.setLevel(logging.INFO)
 
 # redis集群
 class RedisCluster:
 
     def connect(self):
-        redis_nodes = [{'host': '127.0.0.1', 'port': 7001},
-                       {'host': '127.0.0.1', 'port': 7002},
-                       {'host': '127.0.0.2', 'port': 7003},
-                       {'host': '127.0.0.2', 'port': 7004},
-                       {'host': '127.0.0.3', 'port': 7005},
-                       {'host': '127.0.0.3', 'port': 7006}
-                       ]
+        rn = read_config.redis_nodes
+        redis_nodes = json.loads(rn)
         return StrictRedisCluster(startup_nodes=redis_nodes, decode_responses=True)
 
 if __name__ == "__main__":

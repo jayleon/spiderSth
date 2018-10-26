@@ -21,22 +21,13 @@ def load_normal_list(path):
     normal_list = []
     file_object = open(path, 'rb')
     for line in file_object:
+        # 解决出现\xef\xbb\xbf…的问题
+        line = line.decode("utf-8-sig").encode("utf-8")
         line = line.replace('\r', '').replace('\n', '')
         # print line
         if line.strip():
-            normal_list.append(line)
+            normal_list.append(line.strip())
     return normal_list
-
-
-def load_normal_mobile(path):
-    normal_mobile_list = []
-    file_object = open(path, 'rb')
-    for line in file_object:
-        line = line.replace('\r', '').replace('\n', '')
-        # print line
-        if line.strip():
-            normal_mobile_list.append(line)
-    return normal_mobile_list
 
 def load_normal_str(path):
     normal_mobile_list = ''

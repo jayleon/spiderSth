@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # coding:utf-8
 # 部署命令：
-# scp longtail_reducer.py root@127.0.0.1:/data/leon/python/longtailmr/
+# scp longtail_reducer.py root@192.168.0.15:/data/leon/python/longtailmr/
 
 import sys
 

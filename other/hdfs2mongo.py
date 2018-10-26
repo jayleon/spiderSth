@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # coding:utf-8
-# 从hdfs读取文件到mongo；本地open报错，上传脚本到服务器上执行OK。
+# 从hdfs读取文件到mongo；本地HdfsClient.open报错，上传脚本到服务器上执行OK。
 
 import sys,re
 import logging,traceback
@@ -27,7 +27,7 @@ logger.addHandler(ch)
 logger.addHandler(th)
 logger.setLevel(logging.INFO)
 
-hdfs_ip = '127.0.0.1'
+hdfs_ip = 'ip-192-168-0-145.ap-southeast-1.compute.internal'
 
 log_files = ''  # 日志目录
 def Write_log(line):

@@ -2,13 +2,15 @@
 # coding:utf-8
 # 发邮件工具类
 
-import smtplib
+import sys, json, smtplib
 from email.mime.text import MIMEText
+sys.path.append('../config')
+import read_config
 
-mailto_list = ["someone1@qq.com", "someone2@qq.com"]
-mail_host = "smtp.qiye.163.com"  # 设置服务器
-mail_user = "myname@company.com"  # 用户名
-mail_pass = "mypass"  # 口令
+mailto_list = json.loads(read_config.mailto_list)
+mail_host = read_config.mail_host  # 设置服务器
+mail_user = read_config.mail_user  # 用户名
+mail_pass = read_config.mail_pass  # 口令
 
 def send_mail(to_list, sub, content):  # to_list：收件人；sub：主题；content：邮件内容
     me = "my name" + "<" + mail_user + ">"  # 这里的hello可以任意设置，收到信后，将按照设置显示

@@ -86,7 +86,8 @@ def to_etherscan(tokens):
 
             dividcode2 = html.xpath('//*[@id="dividcode"]/pre[2]//text()')
             if dividcode2:
-                constructorArguments = dividcode2[0].strip()
+                constructorArguments = ''
+                for value in dividcode2: constructorArguments += value.strip()
                 print constructorArguments
                 if str(constructorArguments).find('bzzr') == -1:
                     tokens['constructorArguments'] = constructorArguments
@@ -142,7 +143,7 @@ def supplement():
     collection = db.get_collection('tokens')
     for addr in normal_list:
         tokens = collection.find_one({"contractAddress": addr})
-        tokens = to_etherscan_getopcode(tokens=tokens)
+        tokens = to_etherscan(tokens=tokens)
         collection.update_one({'contractAddress': tokens['contractAddress']}, {'$set': tokens})
 
 if __name__ == '__main__':

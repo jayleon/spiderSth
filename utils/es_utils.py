@@ -7,9 +7,11 @@ from elasticsearch import Elasticsearch,helpers
 
 import logging
 from logging.handlers import TimedRotatingFileHandler
+sys.path.append('../config')
+import read_config
 
-ES_HOST = '127.0.0.1'
-ES_PORT = 9200
+ES_HOST = read_config.es_host
+ES_PORT = read_config.es_port
 ES_INDEX = 'my-es-index'
 ES_TYPE = 'my-es-type'
 

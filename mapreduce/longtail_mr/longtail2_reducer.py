@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # coding:utf-8
 # 部署命令：
-# scp longtail_reducer.py root@127.0.0.1:/data/leon/python/longtailmr/
+# scp longtail_reducer.py root@192.168.0.15:/data/leon/python/longtailmr/
 
 import sys
 from itertools import groupby
@@ -29,6 +29,7 @@ def main(separator = '\t'):
         list2.append(value)
     print "list1%s%s" % (separator, list1)
     print "list2%s%s" % (separator, list2)
+
 
 if __name__ == "__main__":
 
