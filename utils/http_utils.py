@@ -9,10 +9,12 @@ import time, sys
 
 import logging
 import requests
-import urllib3
+import random
 import lxml.etree as etree
 import HTMLParser
 from logging.handlers import TimedRotatingFileHandler
+sys.path.append('../utils')
+from read_config import *
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -38,10 +40,11 @@ class HttpRequest(object):
     cookies = None
     response_header = {}
 
-    def __init__(self, url=None, requestType='post', timeout=3, headerDict={}):
+    def __init__(self, url=None, requestType='post', proxy=False, timeout=3, headerDict={}):
         self.url = url
         self.type = requestType
         self.body = {}
+        self.proxy = proxy
         self.timeout = timeout
         self.headerDict = headerDict
         self.cookies = None
@@ -94,6 +97,10 @@ class HttpRequest(object):
         self.headerDict = headerDict
         return self
 
+    def setProxy(self, proxy=False):
+        self.proxy = proxy
+        return self
+
     def send(self):
         try:
             res = self.getResponse()
@@ -122,6 +129,8 @@ class HttpRequest(object):
     def fire(self):
         proxies = None
         # logger.info('local ip !!')
+        if self.proxy:
+            proxies = self.getProxyIp()
         try:
             if self.type == 'post':
                 response = requests.post(self.url, data=self.body, headers=self.headerDict, timeout=self.timeout,
@@ -171,6 +180,15 @@ class HttpRequest(object):
         """具体加密逻辑 """
         # 此处代码隐藏
         return base64.b64encode(data)
+
+    def getProxyIp(self):
+        # 随机获取一个代理IP
+        ips = random.sample(proxy_ips, 1)[0]
+        proxies = {
+            "http": "http://%s" % ips,
+            "https": "http://%s" % ips
+        }
+        return proxies
 
 
 __all__ = ['HttpRequest']

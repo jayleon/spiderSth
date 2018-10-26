@@ -13,6 +13,7 @@ sys.path.append('../utils')
 from mongo_utils import *
 from http_utils import *
 from common_utils import *
+from read_config import *
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -29,6 +30,7 @@ logger.addHandler(ch)
 logger.addHandler(th)
 logger.setLevel(logging.INFO)
 
+URL = read_config.rpc_url
 
 log_files = ''  # 日志目录
 def Write_log(line):
@@ -48,7 +50,7 @@ def to_rpc(addrs):
     try:
         addr = addrs['addr']
         # addr = '0xe530441f4f73bdb6dc2fa5af7c3fc5fd551ec838'
-        URL = "http://192.168.0.227:8545"
+
         http = HttpRequest()
         header = {"Content-Type":"application/json"}
         http.setHeader(headerDict=header)

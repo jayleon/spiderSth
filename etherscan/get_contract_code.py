@@ -105,7 +105,7 @@ def to_etherscan_getopcode(tokens):
         URL = "https://etherscan.io/api?module=opcode&action=getopcode&address=%s" % contractAddress
         http = HttpRequest()
         http.setTimeout(50)
-        texts = http.setUrl(URL).setRequestType('get').getResponse().text
+        texts = http.setUrl(URL).setProxy(False).setRequestType('get').getResponse().text
         if texts != None:
             # 解析json源码
             jt = json.loads(texts, encoding='utf-8')
@@ -143,7 +143,7 @@ def supplement():
     collection = db.get_collection('tokens')
     for addr in normal_list:
         tokens = collection.find_one({"contractAddress": addr})
-        tokens = to_etherscan(tokens=tokens)
+        tokens = to_etherscan_getopcode(tokens=tokens)
         collection.update_one({'contractAddress': tokens['contractAddress']}, {'$set': tokens})
 
 if __name__ == '__main__':

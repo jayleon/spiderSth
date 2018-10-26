@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # coding:utf-8
 # 多线程，调Restful服务获取contract_code信息
+# scp etherscan/get_contract_code_thread.py root@172.0.0.1:/data/leon/python/etherscan/
+# nohup python get_contract_code_thread.py > /dev/null 2>&1  &
 
 import sys,re
 import logging,traceback
@@ -12,6 +14,7 @@ sys.path.append('../utils')
 from mongo_utils import *
 from http_utils import *
 from common_utils import *
+from read_config import *
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -29,6 +32,7 @@ logger.addHandler(th)
 logger.setLevel(logging.INFO)
 
 contract_queue = Queue()  # 队列
+url = read_config.restful_url
 
 log_files = ''  # 日志目录
 def Write_log(line):
@@ -46,18 +50,17 @@ def Write_log(line):
 
 class to_restful_getcode(threading.Thread):
     def run(self):
-        try:
-            global contract_queue
-            client = MongoCluster().connect()
-            db = client.get_database('gse-transaction')
-            collection = db.get_collection('tokens')
-            while not contract_queue.empty():
-                print contract_queue.qsize()
+        global contract_queue
+        client = MongoCluster().connect()
+        db = client.get_database('gse-transaction')
+        collection = db.get_collection('tokens')
+        while not contract_queue.empty():
+            try:
                 tokens = contract_queue.get(block=False)
                 if not tokens:
                     break
                 contractAddress = tokens['contractAddress']
-                URL = "http://localhost:9090/usertoken/getTokenInfo?contractAddress=%s" % contractAddress
+                URL = "%s/usertoken/getTokenInfo?contractAddress=%s" % (url, contractAddress)
                 http = HttpRequest()
                 header = {"Accept": "application/json"}
                 http.setHeader(headerDict=header)
@@ -67,16 +70,22 @@ class to_restful_getcode(threading.Thread):
                     result_ = json.loads(texts)
                     if str(result_['errorCode']) == '0':
                         object_ = result_['object']
-                        collection.update_one({'contractAddress': object_['contractAddress']}, {'$set': object_})
+                        if object_['decimals'] :
+                            collection.update_one({'contractAddress': object_['contractAddress']}, {'$set': object_})
+                            logger.info("now addr is:%s" % contractAddress)
+                        else:
+                            Write_log(contractAddress)
                     else:
                         Write_log(contractAddress)
                 else:
                     Write_log(contractAddress)
 
-        except Exception, e:
-            logger.error(e.message)
-            logger.error(traceback.format_exc())
-            Write_log(contractAddress)
+                time.sleep(0.5)
+            except Exception, e:
+                logger.error(e.message)
+                logger.error(traceback.format_exc())
+                Write_log(contractAddress)
+
 
 def start():
     # 连接MongoDB，查询tokens，根据contractAddress到etherscan查询最新数据
@@ -84,12 +93,12 @@ def start():
     db = client.get_database('gse-transaction')
     collection = db.get_collection('tokens')
     global contract_queue
-    for tokens in collection.find({"contractAddress": {"$gt": "0"}}, {"contractAddress":1}, no_cursor_timeout=True).sort('contractAddress').batch_size(2):
+    for tokens in collection.find({"contractAddress": {"$gt": "0x05d412ce18f24040bb3fa45cf2c69e506586d8e8"}}, {"contractAddress":1}, no_cursor_timeout=True).sort('contractAddress').batch_size(2):
         logger.info(tokens)
         contract_queue.put(tokens)
 
     # 任务开始
-    for i in range(100):
+    for i in range(1):
         p = to_restful_getcode()
         p.start()
 
@@ -108,14 +117,14 @@ def supplement():
             contract_queue.put(tokens)
 
     # 任务开始
-    for i in range(100):
+    for i in range(1):
         p = to_restful_getcode()
         p.start()
 
 if __name__ == '__main__':
 
     # 跑mongo中已有的数据
-    # start()
+    start()
 
     # 补充错误数据
-    supplement()
+    # supplement()
