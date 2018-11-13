@@ -70,7 +70,7 @@ class to_restful_getcode(threading.Thread):
                     result_ = json.loads(texts)
                     if str(result_['errorCode']) == '0':
                         object_ = result_['object']
-                        if object_['decimals'] :
+                        if object_['decimals'] or object_['holders']:
                             collection.update_one({'contractAddress': object_['contractAddress']}, {'$set': object_})
                             logger.info("now addr is:%s" % contractAddress)
                         else:
@@ -93,7 +93,7 @@ def start():
     db = client.get_database('gse-transaction')
     collection = db.get_collection('tokens')
     global contract_queue
-    for tokens in collection.find({"contractAddress": {"$gt": "0x05d412ce18f24040bb3fa45cf2c69e506586d8e8"}}, {"contractAddress":1}, no_cursor_timeout=True).sort('contractAddress').batch_size(2):
+    for tokens in collection.find({"symbol":{"$exists":False}}, {"contractAddress":1}, no_cursor_timeout=True).sort('contractAddress').batch_size(2):
         logger.info(tokens)
         contract_queue.put(tokens)
 

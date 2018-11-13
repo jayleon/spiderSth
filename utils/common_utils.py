@@ -34,7 +34,6 @@ def load_normal_str(path):
     file_object = open(path, 'rb')
     return file_object.read()
 
-
 def load_category(path):
     category = {}
     file_object = open(path, 'rb')
@@ -46,6 +45,22 @@ def load_category(path):
         category[key] = vv
     return category
 
+def get_difference_set(a_list, b_list):
+    # 方法b.简化版：
+    # ret_list = [item for item in a_list if item not in b_list]
+    # 方法c.高级版：
+    ret_list = list(set(a_list) ^ set(b_list))
+    return ret_list
+
+def get_union_set(a_list, b_list):
+    # 求两个集合的并集
+    ret_list = list(set(a_list).union(set(b_list)))
+    return ret_list
+
+def get_intersection_set(a_list, b_list):
+    # 求两个集合的交集
+    ret_list = list((set(a_list).union(set(b_list))) ^ (set(a_list) ^ set(b_list)))
+    return ret_list
 
 def compilePhone2(phone):
     # 正则匹配电话号码，包含：132****7926
@@ -153,6 +168,13 @@ def get_dates_by_years(start, end):
 
     return dates
 
+def parse_time(timeStamp):
+    import time
+    # timeStamp = 1536940800
+    timeArray = time.localtime(timeStamp)
+    otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
+    return otherStyleTime
+
 if __name__ == '__main__':
     # a = [[1, 2], [3, 4], [5, 6], [7, 8]]
     # print a[1][1]
@@ -164,4 +186,4 @@ if __name__ == '__main__':
     # print random.randint(12, 20)
     # json2CSV('./','user.bulk.json','applist2.csv')
     print compilePhone3('186123198088991817');
-    get_dates_by_years('','');
+    print get_dates_by_years('2018-09-09','2018-10-09');
